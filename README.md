@@ -1,7 +1,7 @@
 FPcourse
 ========
 
-How to explain the benefits Functional Programming to your imperative co-worker
+How to explain the benefits of Functional Programming to your imperative co-worker
 
 Contents
 _________

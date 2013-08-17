@@ -1,0 +1,79 @@
+\documentclass{beamer}
+\usetheme[sidebar=false]{uu}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows, automata}
+\usepackage[latin1]{inputenc}
+
+\title[] {Functioneel Programmeren}
+\subtitle{in vergelijking met andere paradigmas}
+\author {Thomas van Binsbergen}
+\date {}
+
+\begin{document}
+% new commands
+\definecolor{brickred}{HTML}{b6321c}
+\newcommand{\mvar}[1]{$\;\texttt{\textcolor{black}{#1}}\;$}
+\newcommand{\mkey}[1]{$\;\texttt{\textcolor{orange}{#1}}\;$}
+\newcommand{\mmod}[1]{$\;\texttt{\textcolor{purple}{#1}}\;$}
+\newcommand{\mdef}[1]{$\;\texttt{\textcolor{blue}{#1}}\;$}
+\newcommand{\mcon}[1]{$\;\texttt{\textcolor{brickred}{#1}}\;$}
+\newcommand{\mtype}[1]{$\;\texttt{\textcolor{brown}{#1}}\;$}
+\newcommand{\mpar}[1]{$(#1)$}
+\newcommand{\mnil}[1]{\mcon{[]}}
+\newcommand{\cons}[3]{\mpar{\mval{#1}\mcon{#2}\mval{#3}}}
+\newcommand{\ra}[0]{$\;\rightarrow\;$}
+\newcommand{\Ra}[0]{$\;\Rightarrow\;$}
+\newcommand{\ind}[0]{$\;\;\;\;$}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}
+    \frametitle{De paradigma's}
+    \begin{itemize}
+        \item Imperatief Programmeren (PHP, Javascript, Java, Python, Scala ...)
+        \item Object Oriented programmeren (Java, PHP, Scala)
+        \item Declaratief/Functioneel Programmeren (Haskell, Scala, ML)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Programmeren zonder assignment}
+    \begin{itemize}
+        \item In de wiskunde zijn er veel variaties op het $=$-teken
+        \item PHP en Javascript zouden het $:=$ symbool moeten gebruiken
+        \item De zogenoemde 'destructieve assignment'
+        \item In Haskell bestaat deze operator niet
+        \item Daardoor hebben we geen variabelen!
+    \end{itemize}
+    \includegraphics[width=0.2\textwidth]{no_assignment.png}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Wat hebben we niet?}
+    \begin{itemize}
+        \item Variabelen
+        \item Arrays (niets anders dan een variabele met structuur)
+        \item Objecten (structuren)
+        \item For en while loops (om door structuren te reizen)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Wat hebben we wel?}
+    \begin{itemize}
+        \item Functies met parameters
+        \item Functies zonder parameters, constanten
+        \item Datatypes (structuren)
+        \item Recursie (om door structuren te reizen)
+    \end{itemize}
+    \includegraphics[width=0.2\textwidth]{no_assignment.png}
+\end{frame}
+
+\end{document}
