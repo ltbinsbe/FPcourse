@@ -72,8 +72,76 @@
         \item Functies zonder parameters, constanten
         \item Datatypes (structuren)
         \item Recursie (om door structuren te reizen)
+        \item Sterke (statische) Typering!
     \end{itemize}
-    \includegraphics[width=0.2\textwidth]{no_assignment.png}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zuiver programmeren (zonder side-effects)}
+    \begin{block}{Voordelen}
+        \begin{itemize}
+            \item Side-effects vormen een grote bron voor fouten
+            \item Eenvoudig redeneren over je programmas
+        \end{itemize}
+    \end{block}
+    \begin{block}{Nadelen}
+        \begin{itemize}
+            \item Stijlere leercurve
+            \item In de praktijk hebben we side-effects:
+            \item User-input, databases, file-input, willekeur, parallelisme
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Statische Typering}
+    \begin{block}{Voordelen}
+        \begin{itemize}
+            \item Veel fouten komen voor 'runtime' aan het licht
+            \item Het type van een functie zegt veel over wat de functie doet
+            \item Dient als een contract tussen gebruiker en implementeerder van de functie!
+        \end{itemize}
+    \end{block}
+    \begin{block}{Nadelen}
+        \begin{itemize}
+            \item De wereld van input/output is niet getypeerd, dit maakt parsen/printen noodzakelijk
+        \end{itemize}
+    \end{block}
+    \begin{block}{Dynamische Typering}
+        \begin{itemize}
+            \item In PHP gebeurd dit parsen/printen achter de schermen 
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Andere eigenschappen van Haskell}
+    \begin{itemize}
+        \item Equational Reasoning
+        \item Hogere-orde functies (abstractie! abstractie! abstractie!)
+        \item Luie evaluatie
+        \item Haskell is een uitstekende gastheer voor EDSLs
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Waar wordt Haskell vooral voor gebruikt?}
+    \begin{itemize}
+        \item Het schrijven van compilers (de ene taal naar de ander omzetten)
+        \item Het analyseren en optimaliseren van broncode
+        \item Grote financiele applicaties
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Parsen, Transformeren, Printen}
+    \begin{block}{De pijpleiding}
+        \begin{itemize}
+            \item Parsen: Input String $\rightarrow$ Structuur
+            \item Transformeren: Structuur  $\rightarrow$ Structuur
+            \item Printen: Structuur $\rightarrow$ Output String
+        \end{itemize}
+    \end{block}
 \end{frame}
 
 \end{document}

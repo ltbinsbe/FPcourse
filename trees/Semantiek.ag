@@ -1,0 +1,58 @@
+module {Semantiek} {} {}
+imports
+{
+import Prelude ((+), Int, return, max)
+import CCO.Component
+}
+
+
+
+
+
+data Root       | Root node :: Node 
+data Node       | Leaf Int
+                | Node children :: Children
+data Children   | Just node :: Node
+                | Some node :: Node children :: Children
+
+
+
+
+
+
+attr Root Node Children 
+    syn sum     :: Int
+   
+sem Node        | Leaf lhs.sum      = @int
+sem Children    | Some lhs.sum      = @node.sum + @children.sum
+
+
+
+
+
+
+attr Node Children
+    inh depth   :: Int
+
+attr Root Node Children 
+    syn height use {(max)} {0} :: Int
+
+sem Root        | Root node.depth       = 0
+sem Node        | Node children.depth   = @lhs.depth + 1
+                       lhs.height       = @lhs.depth         
+
+
+
+
+{
+som :: Component Root Int
+som = component (\root -> 
+        return (sum_Syn_Root (wrap_Root (sem_Root root) Inh_Root))
+        )
+
+height :: Component Root Int
+height = component (\root -> 
+            return (height_Syn_Root (wrap_Root (sem_Root root) Inh_Root))
+            )
+
+}       
