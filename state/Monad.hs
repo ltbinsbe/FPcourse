@@ -23,15 +23,16 @@ vals t = snd $ runState (vals' t) []
                 acc'' <- get
                 put acc''
 
-height :: Tree -> (Int, Int)
+height :: Tree -> Int
 height t = case runState (runErrorT $ htAdp' t) 0 of
-            (Left str, ht) -> error str
-            (Right dt, ht) -> (dt, ht)
+            (Left str, st)  -> error str 
+            (Right res, st) -> res
     where
         htAdp' :: Tree -> ErrorT String (State Int) Int
         htAdp' (Leaf val)
             = do
                 depth <- lift get
+                lift $ put val -- only educational
                 if val > 7 
                     then throwError "You supplied a value greater then 7" 
                     else return depth
