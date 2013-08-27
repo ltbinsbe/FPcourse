@@ -1,6 +1,7 @@
 module Monad where
 
 import Control.Monad.State
+import Control.Monad.Error
 
 data Tree = Leaf Int
           | Bin Tree Tree
@@ -22,18 +23,22 @@ vals t = snd $ runState (vals' t) []
                 acc'' <- get
                 put acc''
 
-htAdp :: Tree -> (Int, Int)
-htAdp t = runState (htAdp' t) 0
+height :: Tree -> (Int, Int)
+height t = case runState (runErrorT $ htAdp' t) 0 of
+            (Left str, ht) -> error str
+            (Right dt, ht) -> (dt, ht)
     where
-        htAdp' :: Tree -> State Int Int
+        htAdp' :: Tree -> ErrorT String (State Int) Int
         htAdp' (Leaf val)
             = do
-                depth <- get
-                return depth
+                depth <- lift get
+                if val > 7 
+                    then throwError "You supplied a value greater then 7" 
+                    else return depth
         htAdp' (Bin l r)
             = do
-                depth <- get
-                put (depth + 1)
-                rht <- htAdp' r
-                lht <- htAdp' l
+                depth <- lift get
+                lift $ put (depth + 1)
+                rht <- htAdp' r `catchError` (const $ return 0)
+                lht <- htAdp' l `catchError` (const $ return 0)
                 return $ max lht rht
