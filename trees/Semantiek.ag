@@ -39,6 +39,8 @@ attr Root Node Children
 
 sem Root        | Root node.depth       = 0
 sem Node        | Node children.depth   = @lhs.depth + 1
+                |
+                    Leaf
                        lhs.height       = @lhs.depth         
 
 

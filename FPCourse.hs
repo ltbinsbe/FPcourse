@@ -97,7 +97,9 @@ som = foldr (+) 0
 ones = 1 : ones
 vijfOnes = take 5 ones
 
-tienPrimes = take 10 primes
+
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+
 primes = (map head (iterate multiples [2..]))
     where 
         multiples (x:xs) = filter (isNotDivBy x) xs

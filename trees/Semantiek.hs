@@ -8,7 +8,7 @@ module Semantiek where
 import Prelude ((+), Int, return, max)
 import CCO.Component
 {-# LINE 11 "Semantiek.hs" #-}
-{-# LINE 47 "./Semantiek.ag" #-}
+{-# LINE 49 "./Semantiek.ag" #-}
 
 som :: Component Root Int
 som = component (\root -> 
@@ -154,8 +154,8 @@ sem_Node_Leaf int_ =
                    {-# LINE 155 "Semantiek.hs" #-}
                    )
               _lhsOheight =
-                  ({-# LINE 38 "./Semantiek.ag" #-}
-                   0
+                  ({-# LINE 44 "./Semantiek.ag" #-}
+                   _lhsIdepth
                    {-# LINE 160 "Semantiek.hs" #-}
                    )
               _self =
@@ -180,8 +180,8 @@ sem_Node_Node children_ =
                    {-# LINE 181 "Semantiek.hs" #-}
                    )
               _lhsOheight =
-                  ({-# LINE 42 "./Semantiek.ag" #-}
-                   _lhsIdepth
+                  ({-# LINE 38 "./Semantiek.ag" #-}
+                   _childrenIheight
                    {-# LINE 186 "Semantiek.hs" #-}
                    )
               _self =
