@@ -1,0 +1,11 @@
+DT  : DateTime  -> Date Time
+T   : Time      -> Hours ":" Minutes ":" Seconds
+T2  : Time      -> Hours ":" Minutes
+H   : Hours     -> Int
+Mi  : Minutes   -> Int
+S   : Seconds   -> Int
+D1  : Date      -> Days "/" Months "/" Years
+D2  : Date      -> Days "-" Months "-" Years
+D   : Days      -> Int
+Mo  : Months    -> Int
+Y4  : Years     -> Int

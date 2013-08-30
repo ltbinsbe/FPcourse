@@ -82,9 +82,9 @@ docHeader r =  unlines  [ "module Parser where"
                         , "import Sem"
                         , "import Lexer"
                         , "import CCO.Component as C"
-                        , "import CCO.Parsing (Parser(..))"
+                        , "import CCO.Parsing (Parser(..), eof)"
                         , "import Control.Applicative"
-                        , "parser = C.parser lexer p" ++ (map toUpper r)
+                        , "parser = C.parser lexer (p" ++ (map toUpper r) ++ " <* eof)"
                         ]
 
 }
