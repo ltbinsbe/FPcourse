@@ -1,0 +1,5 @@
+Root   : Root       -> Node
+Just   : Node       -> Int
+Node   : Node       -> "(" Children ")"
+Single : Children   -> Node
+Some   : Children   -> Node "|" Children

@@ -1,0 +1,119 @@
+module {Gen} {} {}
+imports
+{
+import Data.List (groupBy, intercalate)
+import Data.Char (toUpper)
+import CCO.Component (Component, component)
+}
+
+data Root       | Root   grammar :: Grammar
+data Grammar    | Grammar  ps    :: Productions
+data Production | Production  nt :: Node         cs :: String    fs :: Nodes
+data Node       | NT       ident :: String
+                | T        ident :: String
+                | BoolLit
+                | IntLit
+
+type Productions = [ Production ]
+type Prods       = [ Prod ]
+type Nodes       = [ Node ]
+type GenParsers  = [ GenParser ]
+
+data Document   | Document head  :: String  parsers :: GenParsers
+data GenParser  | Parser      nt :: Node         ps :: Prods
+data Prod       | Prod        nt :: Node         cs :: String     fs :: Nodes
+
+attr Root Grammar Productions Production
+        syn prods use {(++)} {[]}   :: Prods
+        syn errs use {(++)} {[]}    :: {[String]}
+attr Node syn id                    :: String
+
+sem Root       | Root 
+                    grammar.nts = [ nt | (Prod (NT nt) _ _) <- @grammar.prods]
+sem Grammar    | Grammar 
+                    lhs.prods = @ps.prods
+sem Production | Production 
+                    lhs.prods = 
+                        if null @loc.errs 
+                            then [Prod (NT @nt.id) @cs @fs.self] 
+                            else []
+                    loc.errs  = 
+                        case @nt.self of
+                            NT _ -> []
+                            _    -> error "Terminal on LHS, check Parser"
+
+sem Node | NT       lhs.id = @ident
+         | T        lhs.id = @ident
+         | BoolLit  lhs.id = "Bool"
+         | IntLit   lhs.id = "Int"
+
+attr Prods GenParsers
+        syn plns    use {(++)} {[]} :: {[String]}
+attr Prod GenParser
+        syn p                       :: String
+
+sem GenParsers | Cons lhs.plns = @hd.p : @tl.plns
+sem GenParser  | Parser 
+        loc.p    = show @nt.self ++ " = " ++ @loc.pCs
+        loc.pCs  = intercalate " <|> " @ps.plns
+
+sem Prods | Cons lhs.plns   = @hd.p : @tl.plns
+sem Prod  | Prod lhs.p      = "(" ++ consParser @cs @fs.self ++ ")"
+
+{
+validate :: Component Grammar Document
+validate = component (\grammar -> do 
+                let wrapper = (wrap_Root (sem_Root $ Root grammar) Inh_Root{})
+                let errors  = errs_Syn_Root wrapper
+                let prods   = prods_Syn_Root wrapper
+                let parsers = map (\(p@(Prod nt _ _):pds) -> Parser nt (p:pds)) $ groupBy (\(Prod n1 _ _) (Prod n2 _ _) -> n1 == n2) prods
+                let root    = (\(Parser (NT r) _) -> r) $ head parsers
+                case errors of
+                    []  -> return $ Document (docHeader root) parsers
+                    _   -> fail (unlines errors)
+            )
+
+generate :: Component Document String
+generate = component (\doc -> return $ show doc)
+
+consParser :: String -> Nodes -> String
+consParser c fs = consName ++ app ++ fieldParser fs
+    where   consName = map toUpper c
+            app      = case head fs of
+                        (T _) -> " <$ "
+                        _     -> " <$> " 
+
+fieldParser :: Nodes -> String
+fieldParser []      = ""
+fieldParser [f]     = show f 
+fieldParser (f:fs)  = show f ++ conc (head fs) ++ fieldParser fs
+    where conc (T x)= " <* "
+          conc _    = " <*> "
+
+docHeader r =  unlines  [ "module Parser where"
+                        , "import Lexer"
+                        , "import CCO.Component as C"
+                        , "import CCO.Parsing (Parser(..))"
+                        , "import Control.Applicative"
+                        , "parser = C.parser lexer p" ++ r
+                        ]
+
+instance Show Document where
+    show (Document head parsers) = head ++ "\n" ++ unlines parseLines
+        where parseLines = 
+                plns_Syn_GenParsers $ 
+                    wrap_GenParsers (sem_GenParsers parsers) Inh_GenParsers{}
+
+instance Show Node where
+    show (NT nt)    = "p" ++ map toUpper nt
+    show (T tm)     = "pTm \"" ++ tm ++ "\""
+    show (BoolLit)  = "pBool"
+    show (IntLit)   = "pInt"
+}
+
+deriving Grammar    : Show
+deriving Production : Show
+deriving T          : Show
+deriving Ty         : Show
+deriving Node       : Eq
+
