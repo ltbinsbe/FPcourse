@@ -1,7 +1,6 @@
 module Lexer where
 
 import Prelude hiding (lex)
-import Gen
 import CCO.Parsing (Parser(..), satisfy, Symbol(describe), (<!>))
 import CCO.Lexing (Lexer(..), char, anyCharFrom, string, ignore, anyCharBut, alpha, alphaNum)
 import CCO.SourcePos

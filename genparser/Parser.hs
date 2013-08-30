@@ -1,6 +1,6 @@
 module Parser where
 
-import Gen
+import AG.Main
 import Lexer
 
 import CCO.Component (component)

@@ -1,0 +1,30 @@
+        -- these f(ield)s contain the parts of the right hand side of a 
+        -- production that have types (so no terminal symbols)
+        -- they are used in constructor definitions
+attr Nodes syn                   fs :: {[String]} 
+
+sem Nodes | Cons    lhs.fs  = 
+            (if hasType @hd.self then [typeName @hd.self] else []) ++ @tl.fs
+          | Nil     lhs.fs  = []
+
+
+data DataTypes DataType Prods Prod
+    -- the haskell to be generated for this datatype / constructor
+    syn hs use {(++)} {[]}  :: {[String]}
+    
+sem DataType | DataType lhs.hs = 
+    ["data " ++ (map toUpper @nt.id) ++ unlines @ps.hs]
+sem Prod     | Prod     lhs.hs = 
+    ["| " ++ map toUpper @cs ++ "  " ++ 
+        (intercalate " " (map (\f -> map toLower f ++ " :: " ++ f) @fs.fs))]
+
+{
+hasType :: Node -> Bool
+hasType (T _) = False
+hasType _     = True
+
+typeName :: Node -> String
+typeName (NT nt) = map toUpper nt
+typeName BoolLit = "Bool"
+typeName IntLit  = "Int"
+}

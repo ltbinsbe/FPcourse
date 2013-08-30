@@ -1,15 +1,15 @@
 
 
--- UUAGC 0.9.42.3 (Gen.ag)
-module Gen where
+-- UUAGC 0.9.42.3 (AG/Main.ag)
+module AG.Main where
 
-{-# LINE 7 "./Gen.ag" #-}
+{-# LINE 7 "./AG/Main.ag" #-}
 
 import Data.List (groupBy, intercalate)
 import Data.Char (toUpper, toLower)
 import CCO.Component (Component, component)
-{-# LINE 12 "Gen.hs" #-}
-{-# LINE 15 "./ParseGen.ag" #-}
+{-# LINE 12 "AG/Main.hs" #-}
+{-# LINE 15 "./AG/ParseGen.ag" #-}
 
 consParser :: String -> Nodes -> String
 consParser c fs = consName ++ app ++ fieldParser fs
@@ -30,9 +30,9 @@ instance Show Node where
     show (BoolLit)  = "pBool"
     show (IntLit)   = "pInt"
 
-{-# LINE 34 "Gen.hs" #-}
+{-# LINE 34 "AG/Main.hs" #-}
 
-{-# LINE 21 "./HS.ag" #-}
+{-# LINE 21 "./AG/HS.ag" #-}
 
 hasType :: Node -> Bool
 hasType (T _) = False
@@ -42,9 +42,9 @@ typeName :: Node -> String
 typeName (NT nt) = map toUpper nt
 typeName BoolLit = "Bool"
 typeName IntLit  = "Int"
-{-# LINE 46 "Gen.hs" #-}
+{-# LINE 46 "AG/Main.hs" #-}
 
-{-# LINE 21 "./Validate.ag" #-}
+{-# LINE 21 "./AG/Validate.ag" #-}
 
 validate :: Grammar -> IO (Maybe Document)
 validate grammar = do 
@@ -58,9 +58,9 @@ validate grammar = do
     case errors of
         []  -> return $ Just $ Document (docHeader root) dts tms
         _   -> putStrLn (unlines errors) >> return Nothing
-{-# LINE 62 "Gen.hs" #-}
+{-# LINE 62 "AG/Main.hs" #-}
 
-{-# LINE 46 "./Gen.ag" #-}
+{-# LINE 46 "./AG/Main.ag" #-}
 
 generate :: String -> Document -> IO ()
 generate path (Document head dts tms) = do 
@@ -110,7 +110,7 @@ docHeader r =  unlines  [ "module Parser where"
                         , "parser = C.parser lexer p" ++ (map toUpper r)
                         ]
 
-{-# LINE 114 "Gen.hs" #-}
+{-# LINE 114 "AG/Main.hs" #-}
 -- DataType ----------------------------------------------------
 data DataType = DataType (Node) (Prods)
 -- cata
@@ -142,28 +142,28 @@ sem_DataType_DataType nt_ ps_ =
          _psIplns :: ([String])
          _psIself :: Prods
          _p =
-             ({-# LINE 9 "./ParseGen.ag" #-}
+             ({-# LINE 9 "./AG/ParseGen.ag" #-}
               show _ntIself ++ " = " ++ _pCs
-              {-# LINE 148 "Gen.hs" #-}
+              {-# LINE 148 "AG/Main.hs" #-}
               )
          _pCs =
-             ({-# LINE 10 "./ParseGen.ag" #-}
+             ({-# LINE 10 "./AG/ParseGen.ag" #-}
               intercalate " <|> " _psIplns
-              {-# LINE 153 "Gen.hs" #-}
+              {-# LINE 153 "AG/Main.hs" #-}
               )
          _lhsOhs =
-             ({-# LINE 15 "./HS.ag" #-}
+             ({-# LINE 15 "./AG/HS.ag" #-}
               ["data " ++ (map toUpper _ntIid) ++ unlines _psIhs]
-              {-# LINE 158 "Gen.hs" #-}
+              {-# LINE 158 "AG/Main.hs" #-}
               )
          _self =
              DataType _ntIself _psIself
          _lhsOself =
              _self
          _lhsOp =
-             ({-# LINE 5 "./ParseGen.ag" #-}
+             ({-# LINE 5 "./AG/ParseGen.ag" #-}
               _p
-              {-# LINE 167 "Gen.hs" #-}
+              {-# LINE 167 "AG/Main.hs" #-}
               )
          ( _ntIid,_ntIself,_ntItms) =
              nt_
@@ -201,14 +201,14 @@ sem_DataTypes_Cons hd_ tl_ =
          _tlIplns :: ([String])
          _tlIself :: DataTypes
          _lhsOplns =
-             ({-# LINE 7 "./ParseGen.ag" #-}
+             ({-# LINE 7 "./AG/ParseGen.ag" #-}
               _hdIp : _tlIplns
-              {-# LINE 207 "Gen.hs" #-}
+              {-# LINE 207 "AG/Main.hs" #-}
               )
          _lhsOhs =
-             ({-# LINE 13 "./HS.ag" #-}
+             ({-# LINE 13 "./AG/HS.ag" #-}
               ((++) _hdIhs _tlIhs)
-              {-# LINE 212 "Gen.hs" #-}
+              {-# LINE 212 "AG/Main.hs" #-}
               )
          _self =
              (:) _hdIself _tlIself
@@ -225,14 +225,14 @@ sem_DataTypes_Nil =
          _lhsOplns :: ([String])
          _lhsOself :: DataTypes
          _lhsOhs =
-             ({-# LINE 13 "./HS.ag" #-}
+             ({-# LINE 13 "./AG/HS.ag" #-}
               []
-              {-# LINE 231 "Gen.hs" #-}
+              {-# LINE 231 "AG/Main.hs" #-}
               )
          _lhsOplns =
-             ({-# LINE 3 "./ParseGen.ag" #-}
+             ({-# LINE 3 "./AG/ParseGen.ag" #-}
               []
-              {-# LINE 236 "Gen.hs" #-}
+              {-# LINE 236 "AG/Main.hs" #-}
               )
          _self =
              []
@@ -302,19 +302,19 @@ sem_Grammar_Grammar ps_ =
          _psIself :: Productions
          _psItms :: ([String])
          _lhsOprods =
-             ({-# LINE 13 "./Validate.ag" #-}
+             ({-# LINE 13 "./AG/Validate.ag" #-}
               _psIprods
-              {-# LINE 308 "Gen.hs" #-}
+              {-# LINE 308 "AG/Main.hs" #-}
               )
          _lhsOerrs =
-             ({-# LINE 5 "./Validate.ag" #-}
+             ({-# LINE 5 "./AG/Validate.ag" #-}
               _psIerrs
-              {-# LINE 313 "Gen.hs" #-}
+              {-# LINE 313 "AG/Main.hs" #-}
               )
          _lhsOtms =
-             ({-# LINE 7 "./Validate.ag" #-}
+             ({-# LINE 7 "./AG/Validate.ag" #-}
               _psItms
-              {-# LINE 318 "Gen.hs" #-}
+              {-# LINE 318 "AG/Main.hs" #-}
               )
          _self =
              Grammar _psIself
@@ -357,14 +357,14 @@ sem_Node_NT ident_ =
          _lhsOtms :: ([String])
          _lhsOself :: Node
          _lhsOid =
-             ({-# LINE 38 "./Gen.ag" #-}
+             ({-# LINE 38 "./AG/Main.ag" #-}
               ident_
-              {-# LINE 363 "Gen.hs" #-}
+              {-# LINE 363 "AG/Main.hs" #-}
               )
          _lhsOtms =
-             ({-# LINE 9 "./Validate.ag" #-}
+             ({-# LINE 9 "./AG/Validate.ag" #-}
               []
-              {-# LINE 368 "Gen.hs" #-}
+              {-# LINE 368 "AG/Main.hs" #-}
               )
          _self =
              NT ident_
@@ -378,14 +378,14 @@ sem_Node_T ident_ =
          _lhsOtms :: ([String])
          _lhsOself :: Node
          _lhsOid =
-             ({-# LINE 39 "./Gen.ag" #-}
+             ({-# LINE 39 "./AG/Main.ag" #-}
               ident_
-              {-# LINE 384 "Gen.hs" #-}
+              {-# LINE 384 "AG/Main.hs" #-}
               )
          _lhsOtms =
-             ({-# LINE 40 "./Gen.ag" #-}
+             ({-# LINE 40 "./AG/Main.ag" #-}
               [ident_]
-              {-# LINE 389 "Gen.hs" #-}
+              {-# LINE 389 "AG/Main.hs" #-}
               )
          _self =
              T ident_
@@ -398,14 +398,14 @@ sem_Node_BoolLit =
          _lhsOtms :: ([String])
          _lhsOself :: Node
          _lhsOid =
-             ({-# LINE 41 "./Gen.ag" #-}
+             ({-# LINE 41 "./AG/Main.ag" #-}
               "Bool"
-              {-# LINE 404 "Gen.hs" #-}
+              {-# LINE 404 "AG/Main.hs" #-}
               )
          _lhsOtms =
-             ({-# LINE 9 "./Validate.ag" #-}
+             ({-# LINE 9 "./AG/Validate.ag" #-}
               []
-              {-# LINE 409 "Gen.hs" #-}
+              {-# LINE 409 "AG/Main.hs" #-}
               )
          _self =
              BoolLit
@@ -418,14 +418,14 @@ sem_Node_IntLit =
          _lhsOtms :: ([String])
          _lhsOself :: Node
          _lhsOid =
-             ({-# LINE 42 "./Gen.ag" #-}
+             ({-# LINE 42 "./AG/Main.ag" #-}
               "Int"
-              {-# LINE 424 "Gen.hs" #-}
+              {-# LINE 424 "AG/Main.hs" #-}
               )
          _lhsOtms =
-             ({-# LINE 9 "./Validate.ag" #-}
+             ({-# LINE 9 "./AG/Validate.ag" #-}
               []
-              {-# LINE 429 "Gen.hs" #-}
+              {-# LINE 429 "AG/Main.hs" #-}
               )
          _self =
              IntLit
@@ -463,14 +463,14 @@ sem_Nodes_Cons hd_ tl_ =
          _tlIself :: Nodes
          _tlItms :: ([String])
          _lhsOfs =
-             ({-# LINE 6 "./HS.ag" #-}
+             ({-# LINE 6 "./AG/HS.ag" #-}
               (if hasType _hdIself then [typeName _hdIself] else []) ++ _tlIfs
-              {-# LINE 469 "Gen.hs" #-}
+              {-# LINE 469 "AG/Main.hs" #-}
               )
          _lhsOtms =
-             ({-# LINE 9 "./Validate.ag" #-}
+             ({-# LINE 9 "./AG/Validate.ag" #-}
               ((++) _hdItms _tlItms)
-              {-# LINE 474 "Gen.hs" #-}
+              {-# LINE 474 "AG/Main.hs" #-}
               )
          _self =
              (:) _hdIself _tlIself
@@ -487,14 +487,14 @@ sem_Nodes_Nil =
          _lhsOtms :: ([String])
          _lhsOself :: Nodes
          _lhsOfs =
-             ({-# LINE 8 "./HS.ag" #-}
+             ({-# LINE 8 "./AG/HS.ag" #-}
               []
-              {-# LINE 493 "Gen.hs" #-}
+              {-# LINE 493 "AG/Main.hs" #-}
               )
          _lhsOtms =
-             ({-# LINE 9 "./Validate.ag" #-}
+             ({-# LINE 9 "./AG/Validate.ag" #-}
               []
-              {-# LINE 498 "Gen.hs" #-}
+              {-# LINE 498 "AG/Main.hs" #-}
               )
          _self =
              []
@@ -533,15 +533,15 @@ sem_Prod_Prod nt_ cs_ fs_ =
          _fsIself :: Nodes
          _fsItms :: ([String])
          _lhsOp =
-             ({-# LINE 13 "./ParseGen.ag" #-}
+             ({-# LINE 13 "./AG/ParseGen.ag" #-}
               "(" ++ consParser cs_ _fsIself ++ ")"
-              {-# LINE 539 "Gen.hs" #-}
+              {-# LINE 539 "AG/Main.hs" #-}
               )
          _lhsOhs =
-             ({-# LINE 17 "./HS.ag" #-}
+             ({-# LINE 17 "./AG/HS.ag" #-}
               ["| " ++ map toUpper cs_ ++ "  " ++
                   (intercalate " " (map (\f -> map toLower f ++ " :: " ++ f) _fsIfs))]
-              {-# LINE 545 "Gen.hs" #-}
+              {-# LINE 545 "AG/Main.hs" #-}
               )
          _self =
              Prod _ntIself cs_ _fsIself
@@ -583,14 +583,14 @@ sem_Prods_Cons hd_ tl_ =
          _tlIplns :: ([String])
          _tlIself :: Prods
          _lhsOplns =
-             ({-# LINE 12 "./ParseGen.ag" #-}
+             ({-# LINE 12 "./AG/ParseGen.ag" #-}
               _hdIp : _tlIplns
-              {-# LINE 589 "Gen.hs" #-}
+              {-# LINE 589 "AG/Main.hs" #-}
               )
          _lhsOhs =
-             ({-# LINE 13 "./HS.ag" #-}
+             ({-# LINE 13 "./AG/HS.ag" #-}
               ((++) _hdIhs _tlIhs)
-              {-# LINE 594 "Gen.hs" #-}
+              {-# LINE 594 "AG/Main.hs" #-}
               )
          _self =
              (:) _hdIself _tlIself
@@ -607,14 +607,14 @@ sem_Prods_Nil =
          _lhsOplns :: ([String])
          _lhsOself :: Prods
          _lhsOhs =
-             ({-# LINE 13 "./HS.ag" #-}
+             ({-# LINE 13 "./AG/HS.ag" #-}
               []
-              {-# LINE 613 "Gen.hs" #-}
+              {-# LINE 613 "AG/Main.hs" #-}
               )
          _lhsOplns =
-             ({-# LINE 3 "./ParseGen.ag" #-}
+             ({-# LINE 3 "./AG/ParseGen.ag" #-}
               []
-              {-# LINE 618 "Gen.hs" #-}
+              {-# LINE 618 "AG/Main.hs" #-}
               )
          _self =
              []
@@ -655,26 +655,26 @@ sem_Production_Production nt_ cs_ fs_ =
          _fsIself :: Nodes
          _fsItms :: ([String])
          _lhsOprods =
-             ({-# LINE 15 "./Validate.ag" #-}
+             ({-# LINE 15 "./AG/Validate.ag" #-}
               [Prod (NT _ntIid) cs_ _fsIself]
-              {-# LINE 661 "Gen.hs" #-}
+              {-# LINE 661 "AG/Main.hs" #-}
               )
          _errs =
-             ({-# LINE 16 "./Validate.ag" #-}
+             ({-# LINE 16 "./AG/Validate.ag" #-}
               case _ntIself of
                   NT _ -> []
                   _    -> error "Terminal on LHS, check Parser/Lexer"
-              {-# LINE 668 "Gen.hs" #-}
+              {-# LINE 668 "AG/Main.hs" #-}
               )
          _lhsOerrs =
-             ({-# LINE 5 "./Validate.ag" #-}
+             ({-# LINE 5 "./AG/Validate.ag" #-}
               _errs
-              {-# LINE 673 "Gen.hs" #-}
+              {-# LINE 673 "AG/Main.hs" #-}
               )
          _lhsOtms =
-             ({-# LINE 7 "./Validate.ag" #-}
+             ({-# LINE 7 "./AG/Validate.ag" #-}
               ((++) _ntItms _fsItms)
-              {-# LINE 678 "Gen.hs" #-}
+              {-# LINE 678 "AG/Main.hs" #-}
               )
          _self =
              Production _ntIself cs_ _fsIself
@@ -719,19 +719,19 @@ sem_Productions_Cons hd_ tl_ =
          _tlIself :: Productions
          _tlItms :: ([String])
          _lhsOerrs =
-             ({-# LINE 5 "./Validate.ag" #-}
+             ({-# LINE 5 "./AG/Validate.ag" #-}
               ((++) _hdIerrs _tlIerrs)
-              {-# LINE 725 "Gen.hs" #-}
+              {-# LINE 725 "AG/Main.hs" #-}
               )
          _lhsOprods =
-             ({-# LINE 3 "./Validate.ag" #-}
+             ({-# LINE 3 "./AG/Validate.ag" #-}
               ((++) _hdIprods _tlIprods)
-              {-# LINE 730 "Gen.hs" #-}
+              {-# LINE 730 "AG/Main.hs" #-}
               )
          _lhsOtms =
-             ({-# LINE 7 "./Validate.ag" #-}
+             ({-# LINE 7 "./AG/Validate.ag" #-}
               ((++) _hdItms _tlItms)
-              {-# LINE 735 "Gen.hs" #-}
+              {-# LINE 735 "AG/Main.hs" #-}
               )
          _self =
              (:) _hdIself _tlIself
@@ -749,19 +749,19 @@ sem_Productions_Nil =
          _lhsOtms :: ([String])
          _lhsOself :: Productions
          _lhsOerrs =
-             ({-# LINE 5 "./Validate.ag" #-}
+             ({-# LINE 5 "./AG/Validate.ag" #-}
               []
-              {-# LINE 755 "Gen.hs" #-}
+              {-# LINE 755 "AG/Main.hs" #-}
               )
          _lhsOprods =
-             ({-# LINE 3 "./Validate.ag" #-}
+             ({-# LINE 3 "./AG/Validate.ag" #-}
               []
-              {-# LINE 760 "Gen.hs" #-}
+              {-# LINE 760 "AG/Main.hs" #-}
               )
          _lhsOtms =
-             ({-# LINE 7 "./Validate.ag" #-}
+             ({-# LINE 7 "./AG/Validate.ag" #-}
               []
-              {-# LINE 765 "Gen.hs" #-}
+              {-# LINE 765 "AG/Main.hs" #-}
               )
          _self =
              []
@@ -797,19 +797,19 @@ sem_Root_Root grammar_ =
          _grammarIself :: Grammar
          _grammarItms :: ([String])
          _lhsOerrs =
-             ({-# LINE 5 "./Validate.ag" #-}
+             ({-# LINE 5 "./AG/Validate.ag" #-}
               _grammarIerrs
-              {-# LINE 803 "Gen.hs" #-}
+              {-# LINE 803 "AG/Main.hs" #-}
               )
          _lhsOprods =
-             ({-# LINE 3 "./Validate.ag" #-}
+             ({-# LINE 3 "./AG/Validate.ag" #-}
               _grammarIprods
-              {-# LINE 808 "Gen.hs" #-}
+              {-# LINE 808 "AG/Main.hs" #-}
               )
          _lhsOtms =
-             ({-# LINE 7 "./Validate.ag" #-}
+             ({-# LINE 7 "./AG/Validate.ag" #-}
               _grammarItms
-              {-# LINE 813 "Gen.hs" #-}
+              {-# LINE 813 "AG/Main.hs" #-}
               )
          _self =
              Root _grammarIself

@@ -1,5 +1,4 @@
 all :  
-	uuagc -Hdcfws --self Gen.ag
+	uuagc -Hdcfws --self AG/Main.ag
 	ghc Main.hs
-	rm *.hi
-	rm *.o
+	rm *.hi *.o AG/*.o AG/*.hi

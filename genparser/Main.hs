@@ -1,6 +1,6 @@
 module Main where
 
-import Gen (generate, validate)
+import AG.Main (generate, validate)
 import Parser (parser)
 import CCO.Component (ioWrap, printer)
 import Control.Arrow ((>>>))

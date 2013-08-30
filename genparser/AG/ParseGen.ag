@@ -1,0 +1,35 @@
+attr Prods DataTypes
+        -- the parsers for productions and non-terminals
+        syn plns    use {(++)} {[]} :: {[String]}
+attr Prod DataType
+        syn p                       :: String
+
+sem DataTypes | Cons lhs.plns = @hd.p : @tl.plns
+sem DataType  | DataType 
+        loc.p    = show @nt.self ++ " = " ++ @loc.pCs
+        loc.pCs  = intercalate " <|> " @ps.plns
+
+sem Prods | Cons lhs.plns   = @hd.p : @tl.plns
+sem Prod  | Prod lhs.p      = "(" ++ consParser @cs @fs.self ++ ")"
+
+{
+consParser :: String -> Nodes -> String
+consParser c fs = consName ++ app ++ fieldParser fs
+    where   consName = map toUpper c
+            app      = case head fs of
+                        (T _) -> " <$ "
+                        _     -> " <$> " 
+fieldParser :: Nodes -> String
+fieldParser []      = ""
+fieldParser [f]     = show f 
+fieldParser (f:fs)  = show f ++ conc (head fs) ++ fieldParser fs
+    where conc (T x)= " <* "
+          conc _    = " <*> "
+
+instance Show Node where
+    show (NT nt)    = "p" ++ map toUpper nt
+    show (T tm)     = "pTm \"" ++ tm ++ "\""
+    show (BoolLit)  = "pBool"
+    show (IntLit)   = "pInt"
+
+}
