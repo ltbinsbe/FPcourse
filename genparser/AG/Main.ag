@@ -29,7 +29,7 @@ type DataTypes   = [ DataType ]
 
 deriving Grammar    : Show
 deriving Production : Show
-deriving Node       : Eq
+deriving Node       : Show, Eq
 
 attr Node  syn                   id :: String
 

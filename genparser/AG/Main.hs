@@ -19,18 +19,17 @@ consParser c fs = consName ++ app ++ fieldParser fs
                         _     -> " <$> " 
 fieldParser :: Nodes -> String
 fieldParser []      = ""
-fieldParser [f]     = show f 
-fieldParser (f:fs)  = show f ++ conc (head fs) ++ fieldParser fs
+fieldParser [f]     = showP f 
+fieldParser (f:fs)  = showP f ++ conc (head fs) ++ fieldParser fs
     where conc (T x)= " <* "
           conc _    = " <*> "
 
-instance Show Node where
-    show (NT nt)    = "p" ++ map toUpper nt
-    show (T tm)     = "pTm \"" ++ tm ++ "\""
-    show (BoolLit)  = "pBool"
-    show (IntLit)   = "pInt"
+showP (NT nt)    = "p" ++ map toUpper nt
+showP (T tm)     = "pTm \"" ++ tm ++ "\""
+showP (BoolLit)  = "pBool"
+showP (IntLit)   = "pInt"
 
-{-# LINE 34 "AG/Main.hs" #-}
+{-# LINE 33 "AG/Main.hs" #-}
 
 {-# LINE 22 "./AG/HS.ag" #-}
 
@@ -42,7 +41,7 @@ typeName :: Node -> String
 typeName (NT nt) = map toUpper nt
 typeName BoolLit = "Bool"
 typeName IntLit  = "Int"
-{-# LINE 46 "AG/Main.hs" #-}
+{-# LINE 45 "AG/Main.hs" #-}
 
 {-# LINE 16 "./AG/Validate.ag" #-}
 
@@ -59,7 +58,7 @@ validate grammar = do
     case errors of
         []  -> return $ Just $ Document (docHeader root) dts tms
         _   -> putStrLn (unlines errors) >> return Nothing
-{-# LINE 63 "AG/Main.hs" #-}
+{-# LINE 62 "AG/Main.hs" #-}
 
 {-# LINE 41 "./AG/Main.ag" #-}
 
@@ -111,7 +110,7 @@ docHeader r =  unlines  [ "module Parser where"
                         , "parser = C.parser lexer p" ++ (map toUpper r)
                         ]
 
-{-# LINE 115 "AG/Main.hs" #-}
+{-# LINE 114 "AG/Main.hs" #-}
 -- DataType ----------------------------------------------------
 data DataType = DataType (Node) (Productions)
 -- cata
@@ -146,18 +145,18 @@ sem_DataType_DataType nt_ ps_ =
          _psItms :: ([String])
          _p =
              ({-# LINE 9 "./AG/ParseGen.ag" #-}
-              show _ntIself ++ " = " ++ _pCs
-              {-# LINE 151 "AG/Main.hs" #-}
+              showP _ntIself ++ " = " ++ _pCs
+              {-# LINE 150 "AG/Main.hs" #-}
               )
          _pCs =
              ({-# LINE 10 "./AG/ParseGen.ag" #-}
               intercalate " <|> " _psIplns
-              {-# LINE 156 "AG/Main.hs" #-}
+              {-# LINE 155 "AG/Main.hs" #-}
               )
          _lhsOhs =
              ({-# LINE 15 "./AG/HS.ag" #-}
               ["data " ++ (map toUpper _ntIid) ++ unlines _psIhs]
-              {-# LINE 161 "AG/Main.hs" #-}
+              {-# LINE 160 "AG/Main.hs" #-}
               )
          _self =
              DataType _ntIself _psIself
@@ -166,7 +165,7 @@ sem_DataType_DataType nt_ ps_ =
          _lhsOp =
              ({-# LINE 5 "./AG/ParseGen.ag" #-}
               _p
-              {-# LINE 170 "AG/Main.hs" #-}
+              {-# LINE 169 "AG/Main.hs" #-}
               )
          ( _ntIid,_ntIself,_ntItms) =
              nt_
@@ -206,12 +205,12 @@ sem_DataTypes_Cons hd_ tl_ =
          _lhsOplns =
              ({-# LINE 7 "./AG/ParseGen.ag" #-}
               _hdIp : _tlIplns
-              {-# LINE 210 "AG/Main.hs" #-}
+              {-# LINE 209 "AG/Main.hs" #-}
               )
          _lhsOhs =
              ({-# LINE 13 "./AG/HS.ag" #-}
               ((++) _hdIhs _tlIhs)
-              {-# LINE 215 "AG/Main.hs" #-}
+              {-# LINE 214 "AG/Main.hs" #-}
               )
          _self =
              (:) _hdIself _tlIself
@@ -230,12 +229,12 @@ sem_DataTypes_Nil =
          _lhsOhs =
              ({-# LINE 13 "./AG/HS.ag" #-}
               []
-              {-# LINE 234 "AG/Main.hs" #-}
+              {-# LINE 233 "AG/Main.hs" #-}
               )
          _lhsOplns =
              ({-# LINE 3 "./AG/ParseGen.ag" #-}
               []
-              {-# LINE 239 "AG/Main.hs" #-}
+              {-# LINE 238 "AG/Main.hs" #-}
               )
          _self =
              []
@@ -308,17 +307,17 @@ sem_Grammar_Grammar ps_ =
          _lhsOprods =
              ({-# LINE 13 "./AG/Validate.ag" #-}
               _psIself
-              {-# LINE 312 "AG/Main.hs" #-}
+              {-# LINE 311 "AG/Main.hs" #-}
               )
          _lhsOerrs =
              ({-# LINE 7 "./AG/Validate.ag" #-}
               _psIerrs
-              {-# LINE 317 "AG/Main.hs" #-}
+              {-# LINE 316 "AG/Main.hs" #-}
               )
          _lhsOtms =
              ({-# LINE 9 "./AG/Validate.ag" #-}
               _psItms
-              {-# LINE 322 "AG/Main.hs" #-}
+              {-# LINE 321 "AG/Main.hs" #-}
               )
          _self =
              Grammar _psIself
@@ -332,7 +331,7 @@ data Node = NT (String)
           | T (String)
           | BoolLit
           | IntLit
-          deriving ( Eq)
+          deriving ( Eq,Show)
 -- cata
 sem_Node :: Node ->
             T_Node
@@ -363,12 +362,12 @@ sem_Node_NT ident_ =
          _lhsOid =
              ({-# LINE 36 "./AG/Main.ag" #-}
               ident_
-              {-# LINE 367 "AG/Main.hs" #-}
+              {-# LINE 366 "AG/Main.hs" #-}
               )
          _lhsOtms =
              ({-# LINE 11 "./AG/Validate.ag" #-}
               []
-              {-# LINE 372 "AG/Main.hs" #-}
+              {-# LINE 371 "AG/Main.hs" #-}
               )
          _self =
              NT ident_
@@ -384,12 +383,12 @@ sem_Node_T ident_ =
          _lhsOtms =
              ({-# LINE 14 "./AG/Validate.ag" #-}
               [ident_]
-              {-# LINE 388 "AG/Main.hs" #-}
+              {-# LINE 387 "AG/Main.hs" #-}
               )
          _lhsOid =
              ({-# LINE 37 "./AG/Main.ag" #-}
               ident_
-              {-# LINE 393 "AG/Main.hs" #-}
+              {-# LINE 392 "AG/Main.hs" #-}
               )
          _self =
              T ident_
@@ -404,12 +403,12 @@ sem_Node_BoolLit =
          _lhsOid =
              ({-# LINE 38 "./AG/Main.ag" #-}
               "Bool"
-              {-# LINE 408 "AG/Main.hs" #-}
+              {-# LINE 407 "AG/Main.hs" #-}
               )
          _lhsOtms =
              ({-# LINE 11 "./AG/Validate.ag" #-}
               []
-              {-# LINE 413 "AG/Main.hs" #-}
+              {-# LINE 412 "AG/Main.hs" #-}
               )
          _self =
              BoolLit
@@ -424,12 +423,12 @@ sem_Node_IntLit =
          _lhsOid =
              ({-# LINE 39 "./AG/Main.ag" #-}
               "Int"
-              {-# LINE 428 "AG/Main.hs" #-}
+              {-# LINE 427 "AG/Main.hs" #-}
               )
          _lhsOtms =
              ({-# LINE 11 "./AG/Validate.ag" #-}
               []
-              {-# LINE 433 "AG/Main.hs" #-}
+              {-# LINE 432 "AG/Main.hs" #-}
               )
          _self =
              IntLit
@@ -469,12 +468,12 @@ sem_Nodes_Cons hd_ tl_ =
          _lhsOfs =
              ({-# LINE 6 "./AG/HS.ag" #-}
               (if hasType _hdIself then [typeName _hdIself] else []) ++ _tlIfs
-              {-# LINE 473 "AG/Main.hs" #-}
+              {-# LINE 472 "AG/Main.hs" #-}
               )
          _lhsOtms =
              ({-# LINE 11 "./AG/Validate.ag" #-}
               ((++) _hdItms _tlItms)
-              {-# LINE 478 "AG/Main.hs" #-}
+              {-# LINE 477 "AG/Main.hs" #-}
               )
          _self =
              (:) _hdIself _tlIself
@@ -493,12 +492,12 @@ sem_Nodes_Nil =
          _lhsOfs =
              ({-# LINE 8 "./AG/HS.ag" #-}
               []
-              {-# LINE 497 "AG/Main.hs" #-}
+              {-# LINE 496 "AG/Main.hs" #-}
               )
          _lhsOtms =
              ({-# LINE 11 "./AG/Validate.ag" #-}
               []
-              {-# LINE 502 "AG/Main.hs" #-}
+              {-# LINE 501 "AG/Main.hs" #-}
               )
          _self =
              []
@@ -542,23 +541,23 @@ sem_Production_Production nt_ cs_ fs_ =
          _lhsOp =
              ({-# LINE 13 "./AG/ParseGen.ag" #-}
               "(" ++ consParser cs_ _fsIself ++ ")"
-              {-# LINE 546 "AG/Main.hs" #-}
+              {-# LINE 545 "AG/Main.hs" #-}
               )
          _lhsOhs =
              ({-# LINE 18 "./AG/HS.ag" #-}
               ["| " ++ map toUpper cs_ ++ "  " ++
                   (intercalate " " (map (\f -> map toLower f ++ " :: " ++ f) _fsIfs))]
-              {-# LINE 552 "AG/Main.hs" #-}
+              {-# LINE 551 "AG/Main.hs" #-}
               )
          _lhsOerrs =
              ({-# LINE 7 "./AG/Validate.ag" #-}
               []
-              {-# LINE 557 "AG/Main.hs" #-}
+              {-# LINE 556 "AG/Main.hs" #-}
               )
          _lhsOtms =
              ({-# LINE 9 "./AG/Validate.ag" #-}
               ((++) _ntItms _fsItms)
-              {-# LINE 562 "AG/Main.hs" #-}
+              {-# LINE 561 "AG/Main.hs" #-}
               )
          _self =
              Production _ntIself cs_ _fsIself
@@ -608,22 +607,22 @@ sem_Productions_Cons hd_ tl_ =
          _lhsOplns =
              ({-# LINE 12 "./AG/ParseGen.ag" #-}
               _hdIp : _tlIplns
-              {-# LINE 612 "AG/Main.hs" #-}
+              {-# LINE 611 "AG/Main.hs" #-}
               )
          _lhsOerrs =
              ({-# LINE 7 "./AG/Validate.ag" #-}
               ((++) _hdIerrs _tlIerrs)
-              {-# LINE 617 "AG/Main.hs" #-}
+              {-# LINE 616 "AG/Main.hs" #-}
               )
          _lhsOhs =
              ({-# LINE 13 "./AG/HS.ag" #-}
               ((++) _hdIhs _tlIhs)
-              {-# LINE 622 "AG/Main.hs" #-}
+              {-# LINE 621 "AG/Main.hs" #-}
               )
          _lhsOtms =
              ({-# LINE 9 "./AG/Validate.ag" #-}
               ((++) _hdItms _tlItms)
-              {-# LINE 627 "AG/Main.hs" #-}
+              {-# LINE 626 "AG/Main.hs" #-}
               )
          _self =
              (:) _hdIself _tlIself
@@ -644,22 +643,22 @@ sem_Productions_Nil =
          _lhsOerrs =
              ({-# LINE 7 "./AG/Validate.ag" #-}
               []
-              {-# LINE 648 "AG/Main.hs" #-}
+              {-# LINE 647 "AG/Main.hs" #-}
               )
          _lhsOhs =
              ({-# LINE 13 "./AG/HS.ag" #-}
               []
-              {-# LINE 653 "AG/Main.hs" #-}
+              {-# LINE 652 "AG/Main.hs" #-}
               )
          _lhsOplns =
              ({-# LINE 3 "./AG/ParseGen.ag" #-}
               []
-              {-# LINE 658 "AG/Main.hs" #-}
+              {-# LINE 657 "AG/Main.hs" #-}
               )
          _lhsOtms =
              ({-# LINE 9 "./AG/Validate.ag" #-}
               []
-              {-# LINE 663 "AG/Main.hs" #-}
+              {-# LINE 662 "AG/Main.hs" #-}
               )
          _self =
              []
@@ -697,12 +696,12 @@ sem_Root_Root grammar_ =
          _lhsOerrs =
              ({-# LINE 7 "./AG/Validate.ag" #-}
               _grammarIerrs
-              {-# LINE 701 "AG/Main.hs" #-}
+              {-# LINE 700 "AG/Main.hs" #-}
               )
          _lhsOtms =
              ({-# LINE 9 "./AG/Validate.ag" #-}
               _grammarItms
-              {-# LINE 706 "AG/Main.hs" #-}
+              {-# LINE 705 "AG/Main.hs" #-}
               )
          _self =
              Root _grammarIself
@@ -711,7 +710,7 @@ sem_Root_Root grammar_ =
          _lhsOprods =
              ({-# LINE 4 "./AG/Validate.ag" #-}
               _grammarIprods
-              {-# LINE 715 "AG/Main.hs" #-}
+              {-# LINE 714 "AG/Main.hs" #-}
               )
          ( _grammarIerrs,_grammarIprods,_grammarIself,_grammarItms) =
              grammar_
