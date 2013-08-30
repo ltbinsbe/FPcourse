@@ -1,5 +1,6 @@
 module Lexer where
 
+import Sem
 import Data (terminals)
 import CCO.Parsing (Parser(..), satisfy, Symbol(describe))
 import CCO.Lexing (Lexer(..), digit_, anyCharFrom, string)
@@ -8,7 +9,7 @@ import Control.Applicative
 data Token
         = Int       {fromInt  :: Int}
         | Bool      {fromBool :: Bool}
-        | Terminal  {fromTerm :: Char}
+        | Terminal  {fromTerm :: String}
 
 instance Symbol Token where
     describe (Int _)        lex = "integer " ++ lex
@@ -19,7 +20,7 @@ lexer :: Lexer Token
 lexer = terminal_ <|> integer_ <|> bool_
 
 terminal_ :: Lexer Token
-terminal_ = Terminal <$> anyCharFrom terminals
+terminal_ = Terminal <$> foldr1 (<|>) (map string terminals)
 
 integer_ :: Lexer Token
 integer_ = Int <$> digit_
@@ -27,7 +28,7 @@ integer_ = Int <$> digit_
 bool_ :: Lexer Token
 bool_ = (\str -> Bool (str == "True")) <$> (string "False" <|> string "True")
 
-pTm :: Char -> Parser Token Char
+pTm :: String -> Parser Token String
 pTm term = 
     fromTerm <$> satisfy (\t -> (not $ isDigitToken t) && fromTerm t == term)
 

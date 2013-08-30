@@ -2,7 +2,7 @@ module {Gen} {} {}
 imports
 {
 import Data.List (groupBy, intercalate)
-import Data.Char (toUpper)
+import Data.Char (toUpper, toLower)
 import CCO.Component (Component, component)
 }
 
@@ -17,19 +17,22 @@ data Node       | NT       ident :: String
 type Productions = [ Production ]
 type Prods       = [ Prod ]
 type Nodes       = [ Node ]
-type GenParsers  = [ GenParser ]
+type DataTypes  = [ DataType ]
 
-data Document   | Document head  :: String  parsers :: GenParsers
-data GenParser  | Parser      nt :: Node         ps :: Prods
-data Prod       | Prod        nt :: Node         cs :: String     fs :: Nodes
+data Document   | Document head  :: String  dts  :: DataTypes tms:: {[String]}
+data DataType   | DataType    nt :: Node      ps :: Prods
+data Prod       | Prod        nt :: Node      cs :: String     fs :: Nodes
 
 attr Root Grammar Productions Production
         syn prods use {(++)} {[]}   :: Prods
         syn errs use {(++)} {[]}    :: {[String]}
-attr Node syn id                    :: String
+        syn tms use {(++)} {[]}     :: {[String]}
+attr Nodes syn fs :: {[String]}
+attr Node 
+        syn id                      :: String
+attr Nodes Node
+        syn tms use {(++)} {[]}     :: {[String]}
 
-sem Root       | Root 
-                    grammar.nts = [ nt | (Prod (NT nt) _ _) <- @grammar.prods]
 sem Grammar    | Grammar 
                     lhs.prods = @ps.prods
 sem Production | Production 
@@ -42,39 +45,95 @@ sem Production | Production
                             NT _ -> []
                             _    -> error "Terminal on LHS, check Parser"
 
+sem Nodes | Cons    lhs.fs = (if hasType @hd.self then [typeName @hd.self] else []) ++ @tl.fs
+          | Nil     lhs.fs = []
 sem Node | NT       lhs.id = @ident
          | T        lhs.id = @ident
+                    lhs.tms= [@ident]
          | BoolLit  lhs.id = "Bool"
          | IntLit   lhs.id = "Int"
 
-attr Prods GenParsers
+attr Prods DataTypes
         syn plns    use {(++)} {[]} :: {[String]}
-attr Prod GenParser
+attr Prod DataType
         syn p                       :: String
 
-sem GenParsers | Cons lhs.plns = @hd.p : @tl.plns
-sem GenParser  | Parser 
+sem DataTypes | Cons lhs.plns = @hd.p : @tl.plns
+sem DataType  | DataType 
         loc.p    = show @nt.self ++ " = " ++ @loc.pCs
         loc.pCs  = intercalate " <|> " @ps.plns
 
 sem Prods | Cons lhs.plns   = @hd.p : @tl.plns
 sem Prod  | Prod lhs.p      = "(" ++ consParser @cs @fs.self ++ ")"
 
-{
-validate :: Component Grammar Document
-validate = component (\grammar -> do 
-                let wrapper = (wrap_Root (sem_Root $ Root grammar) Inh_Root{})
-                let errors  = errs_Syn_Root wrapper
-                let prods   = prods_Syn_Root wrapper
-                let parsers = map (\(p@(Prod nt _ _):pds) -> Parser nt (p:pds)) $ groupBy (\(Prod n1 _ _) (Prod n2 _ _) -> n1 == n2) prods
-                let root    = (\(Parser (NT r) _) -> r) $ head parsers
-                case errors of
-                    []  -> return $ Document (docHeader root) parsers
-                    _   -> fail (unlines errors)
-            )
 
-generate :: Component Document String
-generate = component (\doc -> return $ show doc)
+data DataTypes DataType Prods Prod
+    syn hs use {(++)} {[]}  :: {[String]}
+    
+sem DataType | DataType lhs.hs = ["data " ++ (map toUpper @nt.id) ++ unlines @ps.hs]
+sem Prod     | Prod     lhs.hs = ["| " ++ map toUpper @cs ++ "  " ++ (intercalate " " (map (\f -> map toLower f ++ " :: " ++ f) @fs.fs))]
+
+{
+validate :: Grammar -> IO (Maybe Document)
+validate grammar = do 
+                let wrapper = (wrap_Root (sem_Root $ Root grammar) Inh_Root{})
+                let errors  = errs_Syn_Root     wrapper
+                let prods   = prods_Syn_Root    wrapper
+                let tms     = tms_Syn_Root      wrapper
+                let dts     = map (\(p@(Prod nt _ _):pds) -> DataType nt (p:pds)) $ groupBy (\(Prod n1 _ _) (Prod n2 _ _) -> n1 == n2) prods
+                let root    = (\(DataType (NT r) _) -> r) $ head dts 
+                case errors of
+                    []  -> return $ Just $ Document (docHeader root) dts tms
+                    _   -> putStrLn (unlines errors) >> return Nothing
+            
+generate :: String -> Document -> IO ()
+generate path (Document head dts tms) = do 
+    lexer <- readFile "utils/Lexer.hs"
+    writeFile (path ++ "Lexer.hs") lexer
+    writeFile (path ++ "Data.hs") terminals
+    writeFile (path ++ "Sem.ag") ag
+    writeFile (path ++ "Parser.hs") parser
+    writeFile (path ++ "Makefile") mk
+    writeFile (path ++ "Main.hs") mf
+      where
+        mf        = unlines $
+                        [ "module Main where"
+                        , "import CCO.Component (ioWrap, component)"
+                        , "import Parser (parser)"
+                        , "import Sem"
+                        , "import Control.Arrow ((>>>))"
+                        , "main = ioWrap $ parser >>> component (\\tree -> return $ show tree)"
+                        ]
+        mk        = unlines $ 
+                        [ "all :"
+                        , "\tuuagc -Hdcfws --self Sem.ag"
+                        , "\tghc --make Main.hs -o parser"
+                        , "\trm *.hi *.o"
+                        ]
+        ag        = unlines $
+                        [ "module{Sem} {} {}"       
+                        ] ++ dtypes ++ sems ++ drvs
+        nts       = [ nt | (DataType (NT nt) _) <- dts]
+        drvs      = map (\t -> "deriving " ++ map toUpper t ++ " : Show") nts
+        sems      = []
+        dtypes    = hs_Syn_DataTypes wrapper
+        terminals = 
+            unlines  [ "module Data where"
+                     , "terminals = [\"" ++ (intercalate "\",\"" tms) ++ "\"]"
+                     ]
+        parser = head ++ "\n" ++ unlines pLines
+        pLines = plns_Syn_DataTypes wrapper
+        wrapper= wrap_DataTypes (sem_DataTypes dts) Inh_DataTypes{}
+
+docHeader r =  unlines  [ "module Parser where"
+                        , "import Sem"
+                        , "import Lexer"
+                        , "import CCO.Component as C"
+                        , "import CCO.Parsing (Parser(..))"
+                        , "import Control.Applicative"
+                        , "parser = C.parser lexer p" ++ (map toUpper r)
+                        ]
+
 
 consParser :: String -> Nodes -> String
 consParser c fs = consName ++ app ++ fieldParser fs
@@ -83,26 +142,21 @@ consParser c fs = consName ++ app ++ fieldParser fs
                         (T _) -> " <$ "
                         _     -> " <$> " 
 
+hasType :: Node -> Bool
+hasType (T _) = False
+hasType _     = True
+
+typeName :: Node -> String
+typeName (NT nt) = map toUpper nt
+typeName BoolLit = "Bool"
+typeName IntLit  = "Int"
+
 fieldParser :: Nodes -> String
 fieldParser []      = ""
 fieldParser [f]     = show f 
 fieldParser (f:fs)  = show f ++ conc (head fs) ++ fieldParser fs
     where conc (T x)= " <* "
           conc _    = " <*> "
-
-docHeader r =  unlines  [ "module Parser where"
-                        , "import Lexer"
-                        , "import CCO.Component as C"
-                        , "import CCO.Parsing (Parser(..))"
-                        , "import Control.Applicative"
-                        , "parser = C.parser lexer p" ++ r
-                        ]
-
-instance Show Document where
-    show (Document head parsers) = head ++ "\n" ++ unlines parseLines
-        where parseLines = 
-                plns_Syn_GenParsers $ 
-                    wrap_GenParsers (sem_GenParsers parsers) Inh_GenParsers{}
 
 instance Show Node where
     show (NT nt)    = "p" ++ map toUpper nt

@@ -3,11 +3,16 @@ module Parser where
 import Gen
 import Lexer
 
-import CCO.Component as C
-import CCO.Parsing (Parser(..), manySepBy, someSepBy, eof)
+import CCO.Component (component)
+import CCO.Feedback  (runFeedback)
+import CCO.Parsing (Parser(..), manySepBy, someSepBy, eof, parse_)
+import CCO.SourcePos (Source(..))
 import Control.Applicative hiding (some, many)
+import System.IO (stderr)
 
-parser = C.parser lexer pGrammar
+parser path gm = runFeedback (parse_ lexer pGrammar (File path) gm) 1 1 stderr
+
+-- component (\stdid -> parse_ lexer pGrammar (File path) gm) 
 
 pGrammar = Grammar <$> some (pProduction <* pLB) <* eof
 
