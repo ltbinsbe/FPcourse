@@ -1,6 +1,8 @@
+attr Root Grammar
+        -- the productions are required to for a document
+        -- which contains datatypes (where productions are constructors)
+        syn prods                   :: Productions
 attr Root Grammar Productions Production
-        -- collect productions
-        syn prods use {(++)} {[]}   :: Prods
         -- collect errors in the grammar
         syn errs use {(++)} {[]}    :: {[String]}
         -- tms is required for the Lexer, they are printed in Data.hs
@@ -8,15 +10,8 @@ attr Root Grammar Productions Production
 attr Nodes Node
         syn tms use {(++)} {[]}     :: {[String]}
 
-
-sem Grammar    | Grammar 
-                    lhs.prods = @ps.prods
-sem Production | Production 
-                    lhs.prods = [Prod (NT @nt.id) @cs @fs.self] 
-                    loc.errs  = 
-                        case @nt.self of
-                            NT _ -> []
-                            _    -> error "Terminal on LHS, check Parser/Lexer"
+sem Grammar | Grammar lhs.prods = @ps.self
+sem Node    | T         lhs.tms = [@ident]
 
 {
 validate :: Grammar -> IO (Maybe Document)
@@ -25,8 +20,9 @@ validate grammar = do
     let errors  = errs_Syn_Root     wrapper
     let prods   = prods_Syn_Root    wrapper
     let tms     = tms_Syn_Root      wrapper
-    let dts     = map (\(p@(Prod nt _ _):pds) -> DataType nt (p:pds)) $ 
-                    groupBy (\(Prod n1 _ _) (Prod n2 _ _) -> n1 == n2) prods
+    let dts     = map (\(p@(Production nt _ _):pds) -> DataType nt (p:pds)) $ 
+                    groupBy (\(Production n1 _ _) (Production n2 _ _) -> 
+                        n1 == n2) prods
     let root    = (\(DataType (NT r) _) -> r) $ head dts 
     case errors of
         []  -> return $ Just $ Document (docHeader root) dts tms

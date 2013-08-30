@@ -1,7 +1,7 @@
-attr Prods DataTypes
+attr Productions DataTypes
         -- the parsers for productions and non-terminals
         syn plns    use {(++)} {[]} :: {[String]}
-attr Prod DataType
+attr Production DataType
         syn p                       :: String
 
 sem DataTypes | Cons lhs.plns = @hd.p : @tl.plns
@@ -9,8 +9,8 @@ sem DataType  | DataType
         loc.p    = show @nt.self ++ " = " ++ @loc.pCs
         loc.pCs  = intercalate " <|> " @ps.plns
 
-sem Prods | Cons lhs.plns   = @hd.p : @tl.plns
-sem Prod  | Prod lhs.p      = "(" ++ consParser @cs @fs.self ++ ")"
+sem Productions | Cons lhs.plns     = @hd.p : @tl.plns
+sem Production  | Production lhs.p  = "(" ++ consParser @cs @fs.self ++ ")"
 
 {
 consParser :: String -> Nodes -> String

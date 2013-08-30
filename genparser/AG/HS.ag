@@ -8,13 +8,14 @@ sem Nodes | Cons    lhs.fs  =
           | Nil     lhs.fs  = []
 
 
-data DataTypes DataType Prods Prod
+data DataTypes DataType Productions Production
     -- the haskell to be generated for this datatype / constructor
     syn hs use {(++)} {[]}  :: {[String]}
     
 sem DataType | DataType lhs.hs = 
     ["data " ++ (map toUpper @nt.id) ++ unlines @ps.hs]
-sem Prod     | Prod     lhs.hs = 
+sem Production 
+       | Production     lhs.hs = 
     ["| " ++ map toUpper @cs ++ "  " ++ 
         (intercalate " " (map (\f -> map toLower f ++ " :: " ++ f) @fs.fs))]
 

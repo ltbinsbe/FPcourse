@@ -21,11 +21,9 @@ data Node       | NT       ident :: String
 
 -- Tree print tree
 data Document   | Document head  :: String  dts  :: DataTypes tms:: {[String]}
-data DataType   | DataType    nt :: Node      ps :: Prods
-data Prod       | Prod        nt :: Node      cs :: String     fs :: Nodes
+data DataType   | DataType    nt :: Node      ps :: Productions
 
 type Productions = [ Production ]
-type Prods       = [ Prod ]
 type Nodes       = [ Node ]
 type DataTypes   = [ DataType ]
 
@@ -37,11 +35,8 @@ attr Node  syn                   id :: String
 
 sem Node  | NT      lhs.id  = @ident
           | T       lhs.id  = @ident
-                    lhs.tms = [@ident]
           | BoolLit lhs.id  = "Bool"
           | IntLit  lhs.id  = "Int"
-
-
 
 {
 generate :: String -> Document -> IO ()
