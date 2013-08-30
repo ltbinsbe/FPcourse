@@ -7,7 +7,7 @@ import CCO.Component (component)
 import CCO.Feedback  (runFeedback)
 import CCO.Parsing (Parser(..), manySepBy, someSepBy, eof, parse_)
 import CCO.SourcePos (Source(..))
-import Control.Applicative hiding (some, many)
+import Control.Applicative 
 import System.IO (stderr)
 
 parser path gm = runFeedback (parse_ lexer pGrammar (File path) gm) 1 1 stderr
@@ -27,5 +27,3 @@ pProduction =
                        IntLit   <$  pKey "Int"  <|> 
                        BoolLit  <$  pKey "Bool"))
 
-many p = (:) <$> p <*> many p <|> pure []
-some p = (:) <$> p <*> many p
