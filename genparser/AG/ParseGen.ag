@@ -15,7 +15,7 @@ sem Production  | Production lhs.p  = "(" ++ consParser @cs @fs.self ++ ")"
 {
 consParser :: String -> Nodes -> String
 consParser c fs = consName ++ app ++ fieldParser fs
-    where   consName = map toUpper c
+    where   consName = c
             app      = case head fs of
                         (T _) -> " <$ "
                         _     -> " <$> " 
@@ -26,9 +26,11 @@ fieldParser (f:fs)  = showP f ++ conc (head fs) ++ fieldParser fs
     where conc (T x)= " <* "
           conc _    = " <*> "
 
-showP (NT nt)    = "p" ++ map toUpper nt
-showP (T tm)     = "pTm \"" ++ tm ++ "\""
-showP (BoolLit)  = "pBool"
-showP (IntLit)   = "pInt"
+showP (NT nt _)    = "p" ++ nt
+showP (T tm)       = "pTm \"" ++ tm ++ "\""
+showP (DigitLit _) = "pDigit"
+showP BR           = "pBR"
+showP (BoolLit _)  = "pBool"
+showP (IntLit _)   = "pInt"
 
 }

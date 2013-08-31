@@ -1,7 +1,7 @@
 module Parser where
 
 import AG.Main
-import Lexer
+import Lexer hiding (Token(BR))
 
 import CCO.Component (component)
 import CCO.Feedback  (runFeedback)
@@ -14,16 +14,18 @@ parser path gm = runFeedback (parse_ lexer pGrammar (File path) gm) 1 1 stderr
 
 -- component (\stdid -> parse_ lexer pGrammar (File path) gm) 
 
-pGrammar = Grammar <$> some (pProduction <* pLB) <* eof
+pGrammar = Grammar <$> some (pProduction <* pBR) <* eof
 
 pProduction = 
-    (\cs nt rhs -> Production (NT nt) cs rhs) <$> 
-                pName <*
+    (\cs nt rhs -> Production (NT nt nt) cs rhs) <$> 
+                pTName <*
                 pKey ":" <*>
-                pName <* 
+                pTName <* 
                 pKey "->" <*> 
-                (some (NT       <$> pName       <|> 
-                       T        <$> pNode       <|> 
-                       IntLit   <$  pKey "Int"  <|> 
-                       BoolLit  <$  pKey "Bool"))
+                (some (flip NT  <$> pFName <* pKey "::" <*> pTName      <|> 
+                       T        <$> pNode                               <|> 
+                       IntLit   <$> pFName <* pKey "::" <* pKey "Int"   <|> 
+                       DigitLit <$> pFName <* pKey "::" <* pKey "Digit" <|> 
+                       BR       <$  pKey "BR"                           <|> 
+                       BoolLit  <$> pFName <* pKey "::" <* pKey "Bool"))
 

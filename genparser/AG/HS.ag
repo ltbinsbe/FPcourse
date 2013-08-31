@@ -1,7 +1,7 @@
         -- these f(ield)s contain the parts of the right hand side of a 
         -- production that have types (so no terminal symbols)
         -- they are used in constructor definitions
-attr Nodes syn                   fs :: {[String]} 
+attr Nodes syn                   fs :: {[(String, String)]} 
 
 sem Nodes | Cons    lhs.fs  = 
             (if hasType @hd.self then [typeName @hd.self] else []) ++ @tl.fs
@@ -13,19 +13,22 @@ data DataTypes DataType Productions Production
     syn hs use {(++)} {[]}  :: {[String]}
     
 sem DataType | DataType lhs.hs = 
-    ["data " ++ (map toUpper @nt.id) ++ unlines @ps.hs]
+    ["data " ++ @nt.id ++ unlines @ps.hs]
 sem Production 
        | Production     lhs.hs = 
-    ["| " ++ map toUpper @cs ++ "  " ++ 
-        (intercalate " " (map (\f -> map toLower f ++ " :: " ++ f) @fs.fs))]
+    ["| " ++ @cs ++ "  " ++ 
+        (intercalate " " (map (\(f,t) -> f ++ " :: " ++ t) @fs.fs))]
 
 {
 hasType :: Node -> Bool
 hasType (T _) = False
+hasType BR    = False
 hasType _     = True
 
-typeName :: Node -> String
-typeName (NT nt) = map toUpper nt
-typeName BoolLit = "Bool"
-typeName IntLit  = "Int"
+typeName :: Node -> (String, String)
+typeName (NT nt nm)     = (nm, nt)
+typeName (DigitLit nm)  = (nm, "Int")
+typeName (BoolLit nm)   = (nm, "Bool")
+typeName (IntLit nm)    = (nm, "Int")
+typeName _              = error "ParseGen bug: errno 1"
 }
