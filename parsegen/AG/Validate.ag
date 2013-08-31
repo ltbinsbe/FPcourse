@@ -23,7 +23,7 @@ validate grammar = do
     let dts     = map (\(p@(Production nt _ _):pds) -> DataType nt (p:pds)) $ 
                     groupBy (\(Production n1 _ _) (Production n2 _ _) -> 
                         n1 == n2) prods
-    let root    = (\(DataType (NT r _) _) -> r) $ head dts 
+    let root    = (\(DataType (NT r _ _) _) -> r) $ head dts 
     case errors of
         []  -> return $ Just $ Document (docHeader root) dts tms
         _   -> putStrLn (unlines errors) >> return Nothing

@@ -19,7 +19,7 @@ instance Symbol Token where
     describe (Digit _)      lex = "digit " ++ lex
     describe (Bool _)       lex = "boolean " ++ lex
     describe (Terminal _)   lex = "terminal " ++ lex
-    describe (BR)              lex = "linebreak " ++ lex
+    describe (BR)           lex = "linebreak " ++ lex
 
 lexer :: Lexer Token
 lexer = terminal_ <|> mydigit_ <|> bool_ <|> br_ <|> ignore (anyCharFrom " \t")

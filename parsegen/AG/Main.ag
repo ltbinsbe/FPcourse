@@ -13,12 +13,16 @@ import CCO.Component (Component, component)
 data Root       | Root   grammar :: Grammar
 data Grammar    | Grammar  ps    :: Productions
 data Production | Production  nt :: Node         cs :: String    fs :: Nodes
-data Node       | NT       ident :: String     name :: String
-                | T        ident :: String     
-                | BR                   
-                | DigitLit                     name :: String
-                | BoolLit                      name :: String
-                | IntLit                       name :: String
+data Node       | NT       ident :: String     name :: String     q :: Quant
+                | T        ident :: String                        q :: Quant
+                | BR                                              q :: Quant
+                | DigitLit                     name :: String     q :: Quant
+                | BoolLit                      name :: String     q :: Quant
+                | IntLit                       name :: String     q :: Quant
+data Quant      | Single   
+                | Many    
+                | Some        
+                | Optional    
 
 -- Tree print tree
 data Document   | Document head  :: String  dts  :: DataTypes tms:: {[String]}
@@ -29,15 +33,19 @@ type Nodes       = [ Node ]
 type DataTypes   = [ DataType ]
 
 deriving Grammar    : Show
+deriving DataType   : Show
 deriving Production : Show
 deriving Node       : Show, Eq
+deriving Quant      : Show, Eq
 
 attr Node  syn                   id :: String
 
-sem Node  | NT      lhs.id  = @ident
-          | T       lhs.id  = @ident
-          | BoolLit lhs.id  = "Bool"
-          | IntLit  lhs.id  = "Int"
+sem Node  | NT          lhs.id  = @ident
+          | T           lhs.id  = @ident
+          | BR          lhs.id  = "BR"
+          | DigitLit    lhs.id  = "Digit"
+          | BoolLit     lhs.id  = "Bool"
+          | IntLit      lhs.id  = "Int"
 
 {
 generate :: String -> Document -> IO ()
@@ -67,7 +75,7 @@ generate path (Document head dts tms) = do
         ag        = unlines $
                         [ "module{Sem} {} {}"       
                         ] ++ dtypes ++ sems ++ drvs
-        nts       = [ nt | (DataType (NT nt _) _) <- dts]
+        nts       = [ nt | (DataType (NT nt _ _) _) <- dts]
         drvs      = map (\t -> "deriving " ++ t ++ " : Show") nts
         sems      = []
         dtypes    = hs_Syn_DataTypes wrapper

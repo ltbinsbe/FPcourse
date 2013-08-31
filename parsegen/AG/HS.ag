@@ -21,14 +21,18 @@ sem Production
 
 {
 hasType :: Node -> Bool
-hasType (T _) = False
-hasType BR    = False
-hasType _     = True
+hasType (T _ _) = False
+hasType (BR _)  = False
+hasType _       = True
 
 typeName :: Node -> (String, String)
-typeName (NT nt nm)     = (nm, nt)
-typeName (DigitLit nm)  = (nm, "Int")
-typeName (BoolLit nm)   = (nm, "Bool")
-typeName (IntLit nm)    = (nm, "Int")
-typeName _              = error "ParseGen bug: errno 1"
+typeName (NT nt nm q)     = (nm, typeQ q nt)
+typeName (DigitLit nm q)  = (nm, typeQ q "Int")
+typeName (BoolLit nm q)   = (nm, typeQ q "Bool")
+typeName (IntLit nm q)    = (nm, typeQ q "Int")
+typeName _                = error "ParseGen bug: errno 1"
+
+typeQ Single   n = n
+typeQ Optional n = "{Maybe " ++ n ++ "}"
+typeQ _ n        = "{[" ++ n ++ "]}"
 }

@@ -4,9 +4,11 @@ T   : Time      -> h :: Hours ":" m :: Minutes
 H   : Hours     -> i :: Int
 Mi  : Minutes   -> i :: Int
 S   : Seconds   -> i :: Int
-D1  : Date      -> d :: Days "/"  m :: Months "/"  y :: Years
+D1  : Date      -> d :: Days "/"  m :: Months "/"  y :: Years -- Verschillende seperators
 D2  : Date      -> d :: Days "-"  m :: Months "-"  y :: Years
 D   : Days      -> i :: Int
 Mo  : Months    -> i :: Int
+-- Alle jaartallen
 Y4  : Years     -> d1 :: Digit d2 :: Digit d3 :: Digit d4 :: Digit
+-- (* Jaartallen be*staande uit 2 cijfers
 Y2  : Years     -> d1 :: Digit d2 :: Digit 
